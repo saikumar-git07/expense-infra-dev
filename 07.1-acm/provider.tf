@@ -6,10 +6,10 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "devopswithaws.store"
-    key    = "expense-infra-dev-acm"
-    region = "us-east-1"
-    encrypt        = true
+    bucket       = "devopswithaws.store"
+    key          = "expense-infra-dev-acm"
+    region       = "us-east-1"
+    encrypt      = true
     use_lockfile = true
   }
 }
