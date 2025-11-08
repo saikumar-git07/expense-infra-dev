@@ -10,7 +10,7 @@ pipeline {
     parameters {
         choice(name: 'action', choices: ['Apply', 'Destroy'], description: 'Pick something')
     }
-    
+
     stages {
         stage('Init') {
             steps {
@@ -21,29 +21,61 @@ pipeline {
             }
         }
         stage('Plan') {
-            
+            when {
+                expression{
+                    params.action == 'Apply'
+                }
+            }
             steps {
                 sh """
                  cd 01-vpc
                  terraform plan
                 """
+               }
             }
-        }
         stage('Deploy') {
-            input {
-                message "Should we continue?"
-                ok "Yes, we should."
-            }
+            when {
+                expression{
+                    params.action == 'Apply'
+                }
+            }   
+           steps {
+                sh """
+                 cd 01-vpc
+                 terraform apply -auto-approve
+                """
+                }
+            }   
+    
+    
+        stage('Deploy') {
+             when {
+                expression{
+                    params.action == 'Apply'
+                }
+             }
            steps {
                 sh """
                  cd 01-vpc
                  terraform apply -auto-approve
                 """
             }
-        }
+        } 
+        stage('Destroy') {
+             when {
+                expression{
+                    params.action == 'destroy'
+                }
+             }
+           steps {
+                sh """
+                 cd 01-vpc
+                 terraform destroy -auto-approve
 
-        
-    }
+               """
+           }
+        }
+    }  
     post { 
         always { 
             echo 'I will always say Hello again!'
@@ -55,5 +87,5 @@ pipeline {
         failure { 
             echo 'I will run when pipeline is failure'
         }
-    }
+     }
 }
